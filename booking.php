@@ -1,63 +1,49 @@
 <?php
-    include 'nav/header.php';
-    // Include the Connector class
-    require_once '../model/server.php';
+	//import model
 
-    // Instantiate the Connector class
-    $connector = new Connector();
-
-    // Fetch all bookings that are pending approval
-    $sql = "SELECT booking_id, booking_fullname, booking_email, booking_number, booking_date, booking_time, booking_status FROM booking_tb WHERE booking_status IN ('pending', 'approved')";
-    $bookings = $connector->executeQuery($sql);
-?>
-
-<link rel="stylesheet" href="../assets/dist/css/book.css">
-<body class="about-page">
-
-<main class="main">
-
-    <!-- Page Title -->
-    <div class="page-title dark-background" data-aos="fade" style="background-image: url(assets/img/about-page-title-bg.jpg);">
-        <div class="container">
-            <h1>Booking</h1>
-            <nav class="breadcrumbs">
-                <ol>
-                    <li><a href="home.php">Home</a></li>
-                    <li class="current">Booking</li>
-                </ol>
-            </nav>
-        </div>
-    </div>
-    <hr>
-    <div class="container">
-        <table class="table table-bordered table-striped">
-            <thead>
-                <tr>             
-                    <th>Full Name</th>
-                    <th>Email</th>
-                    <th>Phone</th>
-                    <th>Date</th>
-                    <th>Time</th>
-                    <th>Status</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php foreach ($bookings as $booking): ?>
-                <tr>
-                    <td><?php echo $booking['booking_fullname']; ?></td>
-                    <td><?php echo $booking['booking_email']; ?></td>
-                    <td><?php echo $booking['booking_number']; ?></td>
-                    <td><?php echo $booking['booking_date']; ?></td>
-                    <td><?php echo $booking['booking_time']; ?></td>
-                    <td style="color: green;"><?php echo $booking['booking_status']; ?></td>
-                </tr>
-                <?php endforeach; ?>
-            </tbody>
-        </table>
-    </div>
-</main>
-<hr>
-
-<?php
-    include 'nav/footer.php';
+	$page_info['page'] = 'booking'; //for page that needs to be called
+	$page_info['sub_page'] = isset($_GET['sub_page'])? $_GET['sub_page'] : 'booking'; //for function to be loaded
+		
+	//-----------------------//
+	//--  booking  --//
+	//-----------------------//
+	try {//used try to catch unfortunate errors
+		//check for active function
+		
+		//no active function, use the default page to view
+		new Booking($page_info);
+		
+	}catch (Throwable $e){ //get the encountered error
+		echo '<h1>ERROR 404</h1>';
+		echo $e->getMessage();
+	}//end of validation
+	
+	
+	//-----------------------//
+	//--  Class Navigation --//
+	//-----------------------//
+	class Booking{
+		//set default page info
+		private $page = '';
+		private $sub_page = '';
+		
+		//run function construct
+		function __construct($page_info){
+			//assign page info
+			$this->page = $page_info['page'];
+			$this->sub_page = $page_info['sub_page'];
+			
+			//run the function
+			$this->{$page_info['sub_page']}();
+		}
+		
+		//-----------------------------//
+		//--   function start here   --//
+		function booking(){
+			include '../views/booking.php';
+		}
+		function pending(){
+			include '../views/pending.php';
+		}
+	}
 ?>
